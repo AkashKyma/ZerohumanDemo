@@ -1,10 +1,10 @@
-# DEM-2 E-commerce Store
+# DEM-3 Storefront Footer, About, and Contact Pages
 
-A polished Next.js storefront for browsing products, managing a persistent cart, and completing a Stripe-ready checkout flow.
+A polished Next.js storefront for browsing products, managing a persistent cart, and navigating a finished marketing shell with footer-driven About and Contact pages.
 
 ## What was built
 
-This ticket delivers a complete front-end store experience with:
+The current app now includes the original store flow plus the DEM-3 footer/navigation work:
 
 - **Homepage** with hero content and featured products
 - **Catalog page** with search, category filtering, and sorting
@@ -12,10 +12,22 @@ This ticket delivers a complete front-end store experience with:
 - **Persistent cart** backed by `localStorage`
 - **Checkout flow** with form validation and mock order completion
 - **Success page** that reads the last order from session storage
+- **Global footer** rendered from `app/layout.tsx`
+- **About page** at `/about` with brand story, values, and CTA links
+- **Contact page** at `/contact` with support, wholesale, and studio-hours details
 - **Mock-ready API route** at `app/api/checkout/route.ts` for future Stripe integration
 - **Automated tests** covering cart behavior and checkout validation/retry behavior
 
 The store ships with **8 seeded products** across Coffee, Tea, Accessories, and Gift Sets.
+
+## Footer ticket summary
+
+DEM-3 adds the finishing navigation layer for the storefront:
+
+- footer links to **About**, **Contact us**, and **Shop**
+- support copy in the footer explains the current mock checkout state
+- dedicated informational pages give the footer destinations real content instead of placeholders
+- the footer is mounted globally so it appears across the storefront experience
 
 ## Tech stack
 
@@ -26,87 +38,47 @@ The store ships with **8 seeded products** across Coffee, Tea, Accessories, and 
 - Zod
 - Vitest + Testing Library
 
-## Getting started
-
-### Install
+## Setup
 
 ```bash
 npm install
 ```
 
-### Run locally
+## Run locally
+
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Then open <http://localhost:3000>.
 
-### Production build
+## Useful commands
 
 ```bash
 npm run build
-```
-
-### Run tests
-
-```bash
+npm start
 npm test
 ```
 
-## Routes
+## Routes to review
 
-- `/` — landing page with featured products
-- `/products` — searchable and filterable catalog
-- `/products/[slug]` — product detail page
-- `/cart` — cart review and quantity management
-- `/checkout` — checkout form with mock-to-live payment seam
-- `/checkout/success` — order confirmation page
-- `/api/checkout` — validates checkout payload and returns mock or Stripe-ready mode
+- `/` — storefront homepage
+- `/products` — product catalog
+- `/products/[slug]` — product detail
+- `/cart` — cart management
+- `/checkout` — checkout form
+- `/checkout/success` — mock order confirmation
+- `/about` — brand/about page added for DEM-3
+- `/contact` — support/contact page added for DEM-3
 
-## Checkout behavior
+## Files added for DEM-3
 
-The checkout flow is **Stripe-ready but safe by default**:
+- `components/Footer.tsx`
+- `app/about/page.tsx`
+- `app/contact/page.tsx`
 
-- If Stripe keys are **not** configured, checkout completes in **mock mode**
-- If both keys are configured, the API reports **ready-for-stripe** mode
-- Current environment placeholders live in `.env.example`
+## Release note
 
-```env
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_SECRET_KEY=
-```
-
-## Project structure
-
-```text
-app/
-  api/checkout/route.ts
-  cart/page.tsx
-  checkout/page.tsx
-  checkout/success/page.tsx
-  products/page.tsx
-  products/[slug]/page.tsx
-components/
-context/
-data/products.json
-lib/
-src/__tests__/
-types/
-```
-
-## Release readiness
-
-Verified in this repo:
-
-- `npm test` ✅
-- `npm run build` ✅
-- Core shopper routes implemented ✅
-- Mock checkout path works without env vars ✅
-- `.env.example` included ✅
-
-## Notes for follow-up
-
-- Replace mock checkout response with live Stripe payment intent creation when keys and backend wiring are ready
-- Keep the existing checkout form boundary and API route as the integration seam
-- See `docs/IMPLEMENTATION_NOTES.md` for architecture and handoff details
+This repository is ready for automated PR packaging with the footer/about/contact documentation updated for reviewers and deployers.

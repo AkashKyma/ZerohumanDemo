@@ -1,10 +1,19 @@
-# DEM-2 Implementation Notes
+# DEM-3 Implementation Notes
 
 ## Scope completed
 
-The current implementation delivers a complete e-commerce demo storefront in Next.js with seeded product data, local cart persistence, and a checkout flow that works without live payment credentials.
+The storefront now includes the DEM-2 shopping flow and the DEM-3 documentation-ready footer work:
+
+- reusable footer mounted in the root layout
+- About page for brand/story content
+- Contact page for support and wholesale information
+- footer links that connect the informational shell back to the shopping experience
 
 ## Architecture summary
+
+### Layout shell
+- `app/layout.tsx` renders `Header`, page content, and the shared `Footer`
+- `components/Footer.tsx` owns footer copy, navigation links, and support messaging
 
 ### App routes
 - `/` — hero and featured products
@@ -13,50 +22,37 @@ The current implementation delivers a complete e-commerce demo storefront in Nex
 - `/cart` — editable cart state and summary
 - `/checkout` — validated checkout form and order review
 - `/checkout/success` — post-purchase confirmation page
+- `/about` — brand/about experience introduced in DEM-3
+- `/contact` — support/contact experience introduced in DEM-3
 - `/api/checkout` — server route validating payloads and returning an order id
 
-### Data and state
-- `data/products.json` contains the seeded catalog
-- `context/CartContext.tsx` owns cart state via reducer + hydration
-- `lib/cart.ts` handles reducer logic, totals, and storage helpers
-- `lib/products.ts` provides product lookup/filter helpers
-- `lib/validations.ts` defines the checkout schema
-
-### Checkout seam
-The checkout path is intentionally split so a live Stripe integration can be added later with limited churn:
-
-- client form submits to `/api/checkout`
-- API route validates cart + form payload
-- current response mode is:
-  - `mock` when Stripe env vars are missing
-  - `ready-for-stripe` when both Stripe placeholders are configured
-- success details are stored in `sessionStorage` for the confirmation page
+### DEM-3 content design
+- footer navigation exposes the non-transactional pages users expect in a storefront shell
+- About page focuses on positioning, values, and conversion back to `/products`
+- Contact page provides clear support destinations without needing backend integrations
+- footer support copy reinforces that checkout is mock-enabled now and Stripe can be added later
 
 ## Release-readiness checks
 
-Validated during this handoff:
+Recommended verification for deployment or final PR review:
 
 ```bash
 npm test
 npm run build
 ```
 
-Results:
-- 2 test files passed
-- 7 tests passed
-- production build completed successfully
+These checks validate that the existing storefront flow still passes after the footer/about/contact additions.
 
 ## Handoff guidance
 
+### What reviewers should verify
+- footer appears on all primary storefront pages
+- footer links resolve to `/about`, `/contact`, and `/products`
+- About and Contact pages match the storefront visual language
+- existing shopping and checkout flows remain intact after shell-level navigation changes
+
 ### Safe next step for live payments
 Replace the mock order response in `app/api/checkout/route.ts` with Stripe payment intent/session creation while keeping the current form boundary intact.
-
-### Safe next step for PR review
-Review primarily:
-- shopper flow coverage across all routes
-- validation copy and empty-state UX
-- cart persistence behavior after refresh
-- mock-to-live checkout seam
 
 ## Files updated by Scribe
 - `README.md`
