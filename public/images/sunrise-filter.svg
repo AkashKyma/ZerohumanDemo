@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#fef3c7" />
+  <circle cx="620" cy="140" r="120" fill="#fb923c" opacity="0.4" />
+  <rect x="120" y="120" width="250" height="330" rx="40" fill="#f59e0b" />
+  <rect x="155" y="160" width="180" height="220" rx="20" fill="#fff7ed" />
+  <text x="245" y="245" text-anchor="middle" font-size="30" font-family="Arial" fill="#7c2d12">Sunrise</text>
+  <text x="245" y="286" text-anchor="middle" font-size="22" font-family="Arial" fill="#7c2d12">Filter</text>
+  <path d="M500 420h150l-75-170-75 170Z" fill="#f97316" />
+</svg>
