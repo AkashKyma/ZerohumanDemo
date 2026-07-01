@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#ecfccb" />
+  <circle cx="620" cy="140" r="110" fill="#84cc16" opacity="0.28" />
+  <rect x="115" y="120" width="260" height="330" rx="42" fill="#65a30d" />
+  <rect x="155" y="160" width="180" height="220" rx="20" fill="#f7fee7" />
+  <text x="245" y="245" text-anchor="middle" font-size="28" font-family="Arial" fill="#365314">Matcha</text>
+  <text x="245" y="286" text-anchor="middle" font-size="22" font-family="Arial" fill="#365314">Cloud</text>
+  <circle cx="570" cy="370" r="78" fill="#4d7c0f" />
+  <rect x="520" y="390" width="120" height="30" rx="15" fill="#fefce8" />
+</svg>
