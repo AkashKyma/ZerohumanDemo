@@ -1,5 +1,17 @@
 # Changelog
 
+## DEM-3 — Adding the Footer
+
+### Added
+- Global `Footer` component rendered through `app/layout.tsx`
+- Footer navigation links for About, Contact us, and Shop
+- `/about` marketing page with store positioning, values, and navigation CTAs
+- `/contact` support page with support email, wholesale contact, and studio hours
+
+### Changed
+- Storefront shell now includes a persistent footer across the app
+- README and implementation notes updated for deployment and PR review handoff
+
 ## DEM-2 — E-commerce Store
 
 ### Added
