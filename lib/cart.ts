@@ -18,6 +18,57 @@ export function calculateItemCount(items: CartItem[]) {
   return items.reduce((count, item) => count + item.quantity, 0);
 }
 
+function clampQuantity(quantity: number, inventory: number) {
+  return Math.min(Math.max(1, quantity), inventory);
+}
+
+function isProduct(value: unknown): value is Product {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const product = value as Partial<Product>;
+  return (
+    typeof product.id === "string" &&
+    typeof product.slug === "string" &&
+    typeof product.name === "string" &&
+    typeof product.description === "string" &&
+    typeof product.price === "number" &&
+    Number.isFinite(product.price) &&
+    typeof product.category === "string" &&
+    typeof product.image === "string" &&
+    typeof product.featured === "boolean" &&
+    typeof product.inventory === "number" &&
+    Number.isFinite(product.inventory) &&
+    product.inventory > 0 &&
+    typeof product.rating === "number" &&
+    Number.isFinite(product.rating) &&
+    Array.isArray(product.tags)
+  );
+}
+
+function normalizeCartItems(items: unknown): CartItem[] {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items.flatMap((item) => {
+    if (!item || typeof item !== "object") {
+      return [];
+    }
+
+    const candidate = item as Partial<CartItem>;
+    if (!isProduct(candidate.product) || typeof candidate.quantity !== "number" || !Number.isFinite(candidate.quantity)) {
+      return [];
+    }
+
+    return [{
+      product: candidate.product,
+      quantity: clampQuantity(Math.floor(candidate.quantity), candidate.product.inventory),
+    }];
+  });
+}
+
 export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case "ADD_ITEM": {
@@ -25,14 +76,14 @@ export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
       const existing = state.find((item) => item.product.id === action.product.id);
 
       if (!existing) {
-        return [...state, { product: action.product, quantity: Math.min(quantity, action.product.inventory) }];
+        return [...state, { product: action.product, quantity: clampQuantity(quantity, action.product.inventory) }];
       }
 
       return state.map((item) =>
         item.product.id === action.product.id
           ? {
               ...item,
-              quantity: Math.min(item.quantity + quantity, item.product.inventory),
+              quantity: clampQuantity(item.quantity + quantity, item.product.inventory),
             }
           : item,
       );
@@ -40,20 +91,18 @@ export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
     case "REMOVE_ITEM":
       return state.filter((item) => item.product.id !== action.productId);
     case "UPDATE_QUANTITY":
-      return state
-        .map((item) =>
-          item.product.id === action.productId
-            ? {
-                ...item,
-                quantity: Math.min(Math.max(1, action.quantity), item.product.inventory),
-              }
-            : item,
-        )
-        .filter((item) => item.quantity > 0);
+      return state.map((item) =>
+        item.product.id === action.productId
+          ? {
+              ...item,
+              quantity: clampQuantity(action.quantity, item.product.inventory),
+            }
+          : item,
+      );
     case "CLEAR_CART":
       return [];
     case "HYDRATE_CART":
-      return action.items.filter((item) => item.quantity > 0 && item.product.inventory > 0);
+      return normalizeCartItems(action.items);
     default:
       return state;
   }
@@ -70,8 +119,8 @@ export function readStoredCart(): CartItem[] {
       return [];
     }
 
-    const parsed = JSON.parse(rawValue) as CartItem[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(rawValue) as unknown;
+    return normalizeCartItems(parsed);
   } catch {
     return [];
   }
@@ -82,5 +131,5 @@ export function writeStoredCart(items: CartItem[]) {
     return;
   }
 
-  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(normalizeCartItems(items)));
 }

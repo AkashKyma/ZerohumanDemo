@@ -1,12 +1,19 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import products from "@/data/products.json";
 import { CheckoutForm } from "@/components/CheckoutForm";
 import { CartProvider } from "@/context/CartContext";
+import { CART_STORAGE_KEY } from "@/lib/cart";
 import { checkoutSchema } from "@/lib/validations";
+import type { Product } from "@/types/product";
+
+const pushMock = vi.fn();
+const sampleProduct = products[0] as Product;
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: pushMock,
   }),
 }));
 
@@ -32,6 +39,13 @@ describe("checkoutSchema", () => {
 });
 
 describe("CheckoutForm", () => {
+  beforeEach(() => {
+    pushMock.mockReset();
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+  });
+
   it("shows the empty-cart message when nothing is in the cart", () => {
     render(
       <CartProvider>
@@ -40,5 +54,41 @@ describe("CheckoutForm", () => {
     );
 
     expect(screen.getByText("Your checkout is waiting on a cart")).toBeInTheDocument();
+  });
+
+  it("surfaces network errors and lets shoppers retry checkout", async () => {
+    window.localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify([{ product: sampleProduct, quantity: 1 }]),
+    );
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+
+    render(
+      <CartProvider>
+        <CheckoutForm />
+      </CartProvider>,
+    );
+
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText("Email"), "shopper@example.com");
+    await user.type(screen.getByLabelText("First name"), "Ava");
+    await user.type(screen.getByLabelText("Last name"), "Stone");
+    await user.type(screen.getByLabelText("Address"), "123 Market Street");
+    await user.type(screen.getByLabelText("City"), "Seattle");
+    await user.type(screen.getByLabelText("State / region"), "WA");
+    await user.type(screen.getByLabelText("Postal code"), "98101");
+    await user.clear(screen.getByLabelText("Country"));
+    await user.type(screen.getByLabelText("Country"), "United States");
+    await user.type(screen.getByLabelText("Name on card"), "Ava Stone");
+    await user.type(screen.getByLabelText("Card number"), "4242 4242 4242 4242");
+    await user.type(screen.getByLabelText("Expiry"), "12/29");
+    await user.type(screen.getByLabelText("CVC"), "123");
+    await user.click(screen.getByRole("button", { name: "Place order" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Checkout is temporarily unavailable. Please try again.")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: "Place order" })).toBeEnabled();
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });

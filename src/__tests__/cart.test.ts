@@ -32,4 +32,17 @@ describe("cartReducer", () => {
     const state = cartReducer([], { type: "ADD_ITEM", product: sampleProduct, quantity: sampleProduct.inventory + 5 });
     expect(state[0].quantity).toBe(sampleProduct.inventory);
   });
+
+  it("sanitizes invalid persisted cart quantities", () => {
+    window.localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify([
+        { product: sampleProduct, quantity: sampleProduct.inventory + 20 },
+        { product: sampleProduct, quantity: Number.NaN },
+        { product: null, quantity: 1 },
+      ]),
+    );
+
+    expect(readStoredCart()).toEqual([{ product: sampleProduct, quantity: sampleProduct.inventory }]);
+  });
 });

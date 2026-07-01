@@ -1,8 +1,30 @@
 import { NextResponse } from "next/server";
 import { checkoutSchema } from "@/lib/validations";
 
+function hasValidItems(value: unknown) {
+  return Array.isArray(value) && value.some((item) => {
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+
+    const candidate = item as { quantity?: unknown; product?: { id?: unknown; price?: unknown } };
+    return (
+      typeof candidate.quantity === "number" &&
+      Number.isFinite(candidate.quantity) &&
+      candidate.quantity > 0 &&
+      typeof candidate.product?.id === "string" &&
+      typeof candidate.product?.price === "number" &&
+      Number.isFinite(candidate.product.price)
+    );
+  });
+}
+
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await request.json().catch(() => null) as { values?: unknown; items?: unknown } | null;
+  if (!body) {
+    return NextResponse.json({ message: "Invalid checkout payload." }, { status: 400 });
+  }
+
   const parsed = checkoutSchema.safeParse(body.values);
 
   if (!parsed.success) {
@@ -14,8 +36,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const items = Array.isArray(body.items) ? body.items : [];
-  if (items.length === 0) {
+  if (!hasValidItems(body.items)) {
     return NextResponse.json({ message: "Your cart is empty." }, { status: 400 });
   }
 

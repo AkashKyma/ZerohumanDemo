@@ -46,37 +46,41 @@ export function CheckoutForm() {
     setErrors({});
     setIsSubmitting(true);
 
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ values: result.data, items }),
-    });
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ values: result.data, items }),
+      });
 
-    const payload = await response.json();
-    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as { message?: string; orderId?: string } | null;
+      if (!response.ok || !payload?.orderId) {
+        setErrors({ email: payload?.message ?? "Checkout failed. Please try again." });
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+          "dem2-last-order",
+          JSON.stringify({
+            orderId: payload.orderId,
+            total: orderTotal,
+            email: values.email,
+            itemCount,
+            items,
+          }),
+        );
+      }
+
+      clearCart();
+      router.push(`/checkout/success?orderId=${payload.orderId}`);
+    } catch {
+      setErrors({ email: "Checkout is temporarily unavailable. Please try again." });
+    } finally {
       setIsSubmitting(false);
-      setErrors({ email: payload.message ?? "Checkout failed. Please try again." });
-      return;
     }
-
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(
-        "dem2-last-order",
-        JSON.stringify({
-          orderId: payload.orderId,
-          total: orderTotal,
-          email: values.email,
-          itemCount,
-          items,
-        }),
-      );
-    }
-
-    clearCart();
-    setIsSubmitting(false);
-    router.push(`/checkout/success?orderId=${payload.orderId}`);
   }
 
   function setField<K extends keyof CheckoutSchema>(key: K, value: CheckoutSchema[K]) {

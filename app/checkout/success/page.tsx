@@ -31,7 +31,13 @@ export default function CheckoutSuccessPage() {
     }
 
     try {
-      setOrder(JSON.parse(raw) as StoredOrder);
+      const parsed = JSON.parse(raw) as StoredOrder;
+      if (parsed.orderId && params.get("orderId") && parsed.orderId !== params.get("orderId")) {
+        setOrder(null);
+        return;
+      }
+
+      setOrder(parsed);
     } catch {
       setOrder(null);
     }
