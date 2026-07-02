@@ -76,6 +76,8 @@ export function prepareProductFormValues(values: ProductFormValues) {
     stockQuantity: normalizeStock(values.stockQuantity),
   };
   const errors: ProductFormErrors = {};
+  const hasInvalidPrice = !Number.isFinite(values.price) || values.price <= 0;
+  const hasInvalidStockQuantity = !Number.isFinite(values.stockQuantity) || !Number.isInteger(values.stockQuantity) || values.stockQuantity < 0;
 
   if (!normalizedValues.name) {
     errors.name = "Enter a product name.";
@@ -85,11 +87,11 @@ export function prepareProductFormValues(values: ProductFormValues) {
     errors.description = "Enter a product description.";
   }
 
-  if (normalizedValues.price <= 0) {
+  if (hasInvalidPrice) {
     errors.price = "Enter a price greater than 0.";
   }
 
-  if (!Number.isInteger(normalizedValues.stockQuantity) || normalizedValues.stockQuantity < 0) {
+  if (hasInvalidStockQuantity) {
     errors.stockQuantity = "Enter a stock quantity of 0 or more.";
   }
 

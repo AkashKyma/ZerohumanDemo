@@ -95,6 +95,7 @@ describe("product management utilities", () => {
       name: "Enter a product name.",
       description: "Enter a product description.",
       price: "Enter a price greater than 0.",
+      stockQuantity: "Enter a stock quantity of 0 or more.",
     });
   });
 });
