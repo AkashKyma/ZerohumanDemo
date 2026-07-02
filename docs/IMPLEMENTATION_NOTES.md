@@ -1,25 +1,26 @@
-# DEM-4 Implementation Notes
+# DEM-6 Implementation Notes
 
 ## Scope completed
 
-The storefront now includes the earlier shopping flow, the DEM-3 shell pages, and the DEM-4 product-management experience:
+The storefront now includes the earlier shopping flow, the DEM-3 shell pages, and the DEM-6 product-management experience:
 
 - in-app product management at `/products/manage`
 - add/edit product workflow for catalog maintenance
 - quick stock updates and active/inactive toggles
 - active-product storefront preview inside the dashboard
+- shopper-facing catalog and product-detail visibility that respect active status
 - browser-local catalog persistence built on top of seeded product data
 
 ## Architecture summary
 
 ### Data and persistence layer
 - `lib/product-management.ts` is the catalog management utility layer
-- It normalizes seed product records, derives safe product slugs, enforces non-negative stock values, and persists the managed catalog to browser `localStorage`
+- It normalizes seed product records, derives safe product slugs, enforces non-negative stock values, manages active/inactive state, and persists the managed catalog to browser `localStorage`
 - Seed data remains the fallback when stored catalog data is missing or invalid
 
 ### Product model
 - `types/product.ts` defines the current catalog contract
-- DEM-4 makes `stockQuantity` and `isActive` first-class product fields
+- DEM-6 uses `stockQuantity` and `isActive` as first-class product fields alongside `name`, `description`, `price`, and `category`
 - Existing shopper-facing fields such as image, rating, and tags remain available so the storefront stays visually complete
 
 ### Management UI
@@ -29,23 +30,24 @@ The storefront now includes the earlier shopping flow, the DEM-3 shell pages, an
 - `components/ProductInventoryTable.tsx` supports quick stock saves and active/inactive toggles
 
 ### Shopper-facing impact
-- The shopper experience now reflects the managed catalog instead of a static-only view
-- Inactive products are hidden from the storefront-facing product grids
+- The shopper experience reflects the managed catalog instead of a static-only view
+- Inactive products are hidden from storefront-facing product grids
+- Inactive products are also excluded from shopper-facing detail interactions
 - The header exposes a direct `Manage` route so the catalog tools are reachable from the app shell
 
 ## Release-readiness checks
 
-Executed during the Scribe phase:
+Recommended verification for release handoff:
 
 ```bash
 npm test
 npm run build
 ```
 
-Results:
-- `npm test` passed with `12/12` tests green
-- `npm run build` completed successfully
-- Production build includes the new `/products/manage` route
+Expected outcome:
+- automated tests pass cleanly
+- production build completes successfully
+- the `/products/manage` route is present in the app build output
 
 ## Handoff guidance
 
@@ -54,7 +56,7 @@ Results:
 - adding a product creates a new catalog entry and updates the storefront preview
 - editing an existing product updates its details cleanly
 - stock changes save from the inventory section
-- inactive products disappear from shopper-facing catalog views
+- inactive products disappear from shopper-facing catalog and detail views
 - existing cart and checkout flows still work after the catalog changes
 
 ### Known limitation
