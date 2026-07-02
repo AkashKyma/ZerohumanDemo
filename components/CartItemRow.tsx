@@ -31,7 +31,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <QuantitySelector
             quantity={item.quantity}
-            max={item.product.inventory}
+            max={Math.max(item.product.stockQuantity, item.quantity, 1)}
             onChange={(quantity) => updateQuantity(item.product.id, quantity)}
           />
           <button

@@ -1,33 +1,50 @@
-# DEM-3 Storefront Footer, About, and Contact Pages
+# DEM-4 Storefront with Product Management
 
-A polished Next.js storefront for browsing products, managing a persistent cart, and navigating a finished marketing shell with footer-driven About and Contact pages.
+A polished Next.js storefront for browsing products, managing a persistent cart, and now maintaining the catalog directly inside the app.
 
 ## What was built
 
-The current app now includes the original store flow plus the DEM-3 footer/navigation work:
+The app now includes the original shopping flow, the DEM-3 marketing shell, and the DEM-4 product-management experience:
 
 - **Homepage** with hero content and featured products
-- **Catalog page** with search, category filtering, and sorting
-- **Product detail pages** for individual items
+- **Catalog page** with product browsing for active storefront items
+- **Product detail pages** for individual products
 - **Persistent cart** backed by `localStorage`
 - **Checkout flow** with form validation and mock order completion
 - **Success page** that reads the last order from session storage
-- **Global footer** rendered from `app/layout.tsx`
-- **About page** at `/about` with brand story, values, and CTA links
-- **Contact page** at `/contact` with support, wholesale, and studio-hours details
-- **Mock-ready API route** at `app/api/checkout/route.ts` for future Stripe integration
-- **Automated tests** covering cart behavior and checkout validation/retry behavior
+- **Global footer** with About and Contact navigation
+- **Product management dashboard** at `/products/manage`
+- **Add product flow** for creating new catalog items
+- **Edit product flow** for updating existing product details
+- **Stock management** for changing inventory quantities in place
+- **Active/inactive toggle** so hidden products stay out of the shopper-facing catalog
+- **Browser-local catalog persistence** so management changes survive refreshes in the current browser
+- **Automated tests** covering cart behavior, checkout behavior, and product-management utilities
 
-The store ships with **8 seeded products** across Coffee, Tea, Accessories, and Gift Sets.
+## DEM-4 feature overview
 
-## Footer ticket summary
+The new product-management flow adds support for products with these fields:
 
-DEM-3 adds the finishing navigation layer for the storefront:
+- **name**
+- **description**
+- **price**
+- **category**
+- **stock quantity**
+- **active status**
 
-- footer links to **About**, **Contact us**, and **Shop**
-- support copy in the footer explains the current mock checkout state
-- dedicated informational pages give the footer destinations real content instead of placeholders
-- the footer is mounted globally so it appears across the storefront experience
+### Management behavior
+
+- Add products from the in-app management form
+- Edit existing products without leaving the dashboard
+- Update stock quantity from the inventory table
+- Toggle products between active and inactive states
+- Preview active products exactly as shoppers see them
+
+### Storefront behavior
+
+- Only **active** products appear in customer-facing catalog views
+- Catalog changes are stored in browser `localStorage`
+- Seed products are used as the default catalog if no local catalog exists yet
 
 ## Tech stack
 
@@ -57,28 +74,41 @@ Then open <http://localhost:3000>.
 ## Useful commands
 
 ```bash
+npm test
 npm run build
 npm start
-npm test
 ```
 
 ## Routes to review
 
 - `/` — storefront homepage
-- `/products` — product catalog
-- `/products/[slug]` — product detail
+- `/products` — shopper-facing catalog
+- `/products/[slug]` — product detail page
+- `/products/manage` — product management dashboard added for DEM-4
 - `/cart` — cart management
 - `/checkout` — checkout form
 - `/checkout/success` — mock order confirmation
-- `/about` — brand/about page added for DEM-3
-- `/contact` — support/contact page added for DEM-3
+- `/about` — brand/about page
+- `/contact` — support/contact page
 
-## Files added for DEM-3
+## Key DEM-4 files
 
-- `components/Footer.tsx`
-- `app/about/page.tsx`
-- `app/contact/page.tsx`
+- `app/products/manage/page.tsx`
+- `components/ProductManagementDashboard.tsx`
+- `components/ProductForm.tsx`
+- `components/ProductInventoryTable.tsx`
+- `lib/product-management.ts`
+- `src/__tests__/product-management.test.ts`
+
+## Demo limitation
+
+Product-management changes are intentionally **browser-local** for this implementation. They are production-clean for the current demo/storefront architecture, but they are not shared across browsers or users because there is no backend catalog write path yet.
 
 ## Release note
 
-This repository is ready for automated PR packaging with the footer/about/contact documentation updated for reviewers and deployers.
+Documentation, changelog, and implementation notes have been updated for DEM-4. Current release-readiness checks pass with:
+
+```bash
+npm test
+npm run build
+```

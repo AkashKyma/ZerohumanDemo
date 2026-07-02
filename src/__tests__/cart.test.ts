@@ -28,21 +28,48 @@ describe("cartReducer", () => {
     expect(readStoredCart()).toEqual(state);
   });
 
-  it("clamps quantity updates to inventory", () => {
-    const state = cartReducer([], { type: "ADD_ITEM", product: sampleProduct, quantity: sampleProduct.inventory + 5 });
-    expect(state[0].quantity).toBe(sampleProduct.inventory);
+  it("clamps quantity updates to stock quantity", () => {
+    const state = cartReducer([], { type: "ADD_ITEM", product: sampleProduct, quantity: sampleProduct.stockQuantity + 5 });
+    expect(state[0].quantity).toBe(sampleProduct.stockQuantity);
   });
 
   it("sanitizes invalid persisted cart quantities", () => {
     window.localStorage.setItem(
       CART_STORAGE_KEY,
       JSON.stringify([
-        { product: sampleProduct, quantity: sampleProduct.inventory + 20 },
+        { product: sampleProduct, quantity: sampleProduct.stockQuantity + 20 },
         { product: sampleProduct, quantity: Number.NaN },
         { product: null, quantity: 1 },
       ]),
     );
 
-    expect(readStoredCart()).toEqual([{ product: sampleProduct, quantity: sampleProduct.inventory }]);
+    expect(readStoredCart()).toEqual([{ product: sampleProduct, quantity: sampleProduct.stockQuantity }]);
+  });
+
+  it("migrates legacy persisted product inventory fields", () => {
+    window.localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify([
+        {
+          product: {
+            ...sampleProduct,
+            stockQuantity: undefined,
+            inventory: 7,
+            isActive: true,
+          },
+          quantity: 10,
+        },
+      ]),
+    );
+
+    expect(readStoredCart()).toEqual([
+      {
+        product: {
+          ...sampleProduct,
+          stockQuantity: 7,
+        },
+        quantity: 7,
+      },
+    ]);
   });
 });

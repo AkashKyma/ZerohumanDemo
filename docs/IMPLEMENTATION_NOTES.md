@@ -1,58 +1,67 @@
-# DEM-3 Implementation Notes
+# DEM-4 Implementation Notes
 
 ## Scope completed
 
-The storefront now includes the DEM-2 shopping flow and the DEM-3 documentation-ready footer work:
+The storefront now includes the earlier shopping flow, the DEM-3 shell pages, and the DEM-4 product-management experience:
 
-- reusable footer mounted in the root layout
-- About page for brand/story content
-- Contact page for support and wholesale information
-- footer links that connect the informational shell back to the shopping experience
+- in-app product management at `/products/manage`
+- add/edit product workflow for catalog maintenance
+- quick stock updates and active/inactive toggles
+- active-product storefront preview inside the dashboard
+- browser-local catalog persistence built on top of seeded product data
 
 ## Architecture summary
 
-### Layout shell
-- `app/layout.tsx` renders `Header`, page content, and the shared `Footer`
-- `components/Footer.tsx` owns footer copy, navigation links, and support messaging
+### Data and persistence layer
+- `lib/product-management.ts` is the catalog management utility layer
+- It normalizes seed product records, derives safe product slugs, enforces non-negative stock values, and persists the managed catalog to browser `localStorage`
+- Seed data remains the fallback when stored catalog data is missing or invalid
 
-### App routes
-- `/` — hero and featured products
-- `/products` — searchable/filterable catalog
-- `/products/[slug]` — product detail and related product flow
-- `/cart` — editable cart state and summary
-- `/checkout` — validated checkout form and order review
-- `/checkout/success` — post-purchase confirmation page
-- `/about` — brand/about experience introduced in DEM-3
-- `/contact` — support/contact experience introduced in DEM-3
-- `/api/checkout` — server route validating payloads and returning an order id
+### Product model
+- `types/product.ts` defines the current catalog contract
+- DEM-4 makes `stockQuantity` and `isActive` first-class product fields
+- Existing shopper-facing fields such as image, rating, and tags remain available so the storefront stays visually complete
 
-### DEM-3 content design
-- footer navigation exposes the non-transactional pages users expect in a storefront shell
-- About page focuses on positioning, values, and conversion back to `/products`
-- Contact page provides clear support destinations without needing backend integrations
-- footer support copy reinforces that checkout is mock-enabled now and Stripe can be added later
+### Management UI
+- `app/products/manage/page.tsx` mounts the management experience
+- `components/ProductManagementDashboard.tsx` coordinates the management state, summary metrics, storefront preview, and inventory controls
+- `components/ProductForm.tsx` handles add/edit submission for product details
+- `components/ProductInventoryTable.tsx` supports quick stock saves and active/inactive toggles
+
+### Shopper-facing impact
+- The shopper experience now reflects the managed catalog instead of a static-only view
+- Inactive products are hidden from the storefront-facing product grids
+- The header exposes a direct `Manage` route so the catalog tools are reachable from the app shell
 
 ## Release-readiness checks
 
-Recommended verification for deployment or final PR review:
+Executed during the Scribe phase:
 
 ```bash
 npm test
 npm run build
 ```
 
-These checks validate that the existing storefront flow still passes after the footer/about/contact additions.
+Results:
+- `npm test` passed with `12/12` tests green
+- `npm run build` completed successfully
+- Production build includes the new `/products/manage` route
 
 ## Handoff guidance
 
 ### What reviewers should verify
-- footer appears on all primary storefront pages
-- footer links resolve to `/about`, `/contact`, and `/products`
-- About and Contact pages match the storefront visual language
-- existing shopping and checkout flows remain intact after shell-level navigation changes
+- `/products/manage` loads and shows the dashboard shell
+- adding a product creates a new catalog entry and updates the storefront preview
+- editing an existing product updates its details cleanly
+- stock changes save from the inventory section
+- inactive products disappear from shopper-facing catalog views
+- existing cart and checkout flows still work after the catalog changes
 
-### Safe next step for live payments
-Replace the mock order response in `app/api/checkout/route.ts` with Stripe payment intent/session creation while keeping the current form boundary intact.
+### Known limitation
+- Catalog writes are browser-local only because this implementation intentionally uses `localStorage` instead of a shared backend catalog service
+
+### Safe next step
+- If the product catalog needs multi-user or production persistence, move the management utility layer behind a server-backed catalog API while preserving the current product form and inventory UI boundaries
 
 ## Files updated by Scribe
 - `README.md`

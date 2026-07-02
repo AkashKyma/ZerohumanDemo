@@ -1,26 +1,34 @@
-import products from "@/data/products.json";
+import { getSeedProducts } from "@/lib/product-management";
 import type { Product } from "@/types/product";
 
-const allProducts = products as Product[];
+const allProducts = getSeedProducts();
 
-export function getAllProducts() {
-  return allProducts;
+interface GetAllProductsOptions {
+  includeInactive?: boolean;
+}
+
+export function getAllProducts(options: GetAllProductsOptions = {}) {
+  if (options.includeInactive) {
+    return allProducts;
+  }
+
+  return allProducts.filter((product) => product.isActive);
 }
 
 export function getFeaturedProducts() {
-  return allProducts.filter((product) => product.featured);
+  return getAllProducts().filter((product) => product.featured);
 }
 
-export function getProductBySlug(slug: string) {
-  return allProducts.find((product) => product.slug === slug);
+export function getProductBySlug(slug: string, options: GetAllProductsOptions = {}) {
+  return getAllProducts({ includeInactive: options.includeInactive ?? true }).find((product) => product.slug === slug);
 }
 
-export function getCategories() {
-  return Array.from(new Set(allProducts.map((product) => product.category)));
+export function getCategories(options: GetAllProductsOptions = {}) {
+  return Array.from(new Set(getAllProducts(options).map((product) => product.category)));
 }
 
-export function getRelatedProducts(currentProductId: string, category: Product["category"]) {
-  return allProducts
+export function getRelatedProducts(currentProductId: string, category: Product["category"], options: GetAllProductsOptions = {}) {
+  return getAllProducts(options)
     .filter((product) => product.id !== currentProductId && product.category === category)
     .slice(0, 3);
 }

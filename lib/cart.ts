@@ -1,3 +1,4 @@
+import { normalizeProductRecord } from "@/lib/product-management";
 import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 
@@ -18,33 +19,9 @@ export function calculateItemCount(items: CartItem[]) {
   return items.reduce((count, item) => count + item.quantity, 0);
 }
 
-function clampQuantity(quantity: number, inventory: number) {
-  return Math.min(Math.max(1, quantity), inventory);
-}
-
-function isProduct(value: unknown): value is Product {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const product = value as Partial<Product>;
-  return (
-    typeof product.id === "string" &&
-    typeof product.slug === "string" &&
-    typeof product.name === "string" &&
-    typeof product.description === "string" &&
-    typeof product.price === "number" &&
-    Number.isFinite(product.price) &&
-    typeof product.category === "string" &&
-    typeof product.image === "string" &&
-    typeof product.featured === "boolean" &&
-    typeof product.inventory === "number" &&
-    Number.isFinite(product.inventory) &&
-    product.inventory > 0 &&
-    typeof product.rating === "number" &&
-    Number.isFinite(product.rating) &&
-    Array.isArray(product.tags)
-  );
+function clampQuantity(quantity: number, stockQuantity: number) {
+  const safeMax = Math.max(1, Math.floor(stockQuantity));
+  return Math.min(Math.max(1, Math.floor(quantity)), safeMax);
 }
 
 function normalizeCartItems(items: unknown): CartItem[] {
@@ -58,13 +35,22 @@ function normalizeCartItems(items: unknown): CartItem[] {
     }
 
     const candidate = item as Partial<CartItem>;
-    if (!isProduct(candidate.product) || typeof candidate.quantity !== "number" || !Number.isFinite(candidate.quantity)) {
+    if (!candidate.product || typeof candidate.product !== "object") {
+      return [];
+    }
+
+    if (typeof candidate.quantity !== "number" || !Number.isFinite(candidate.quantity)) {
+      return [];
+    }
+
+    const product = normalizeProductRecord(candidate.product as Product);
+    if (product.stockQuantity < 1 || !product.isActive) {
       return [];
     }
 
     return [{
-      product: candidate.product,
-      quantity: clampQuantity(Math.floor(candidate.quantity), candidate.product.inventory),
+      product,
+      quantity: clampQuantity(candidate.quantity, product.stockQuantity),
     }];
   });
 }
@@ -72,18 +58,22 @@ function normalizeCartItems(items: unknown): CartItem[] {
 export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case "ADD_ITEM": {
+      if (action.product.stockQuantity < 1 || !action.product.isActive) {
+        return state;
+      }
+
       const quantity = Math.max(1, action.quantity ?? 1);
       const existing = state.find((item) => item.product.id === action.product.id);
 
       if (!existing) {
-        return [...state, { product: action.product, quantity: clampQuantity(quantity, action.product.inventory) }];
+        return [...state, { product: action.product, quantity: clampQuantity(quantity, action.product.stockQuantity) }];
       }
 
       return state.map((item) =>
         item.product.id === action.product.id
           ? {
               ...item,
-              quantity: clampQuantity(item.quantity + quantity, item.product.inventory),
+              quantity: clampQuantity(item.quantity + quantity, item.product.stockQuantity),
             }
           : item,
       );
@@ -95,7 +85,7 @@ export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
         item.product.id === action.productId
           ? {
               ...item,
-              quantity: clampQuantity(action.quantity, item.product.inventory),
+              quantity: clampQuantity(action.quantity, item.product.stockQuantity),
             }
           : item,
       );

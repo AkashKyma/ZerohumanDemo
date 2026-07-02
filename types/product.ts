@@ -1,8 +1,6 @@
-export type ProductCategory =
-  | "Coffee"
-  | "Tea"
-  | "Accessories"
-  | "Gift Sets";
+export const PRODUCT_CATEGORIES = ["Coffee", "Tea", "Accessories", "Gift Sets"] as const;
+
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
 export interface Product {
   id: string;
@@ -13,7 +11,8 @@ export interface Product {
   category: ProductCategory;
   image: string;
   featured: boolean;
-  inventory: number;
+  stockQuantity: number;
+  isActive: boolean;
   rating: number;
   tags: string[];
 }

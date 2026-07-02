@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { ProductGrid } from "@/components/ProductGrid";
-import { getFeaturedProducts } from "@/lib/products";
+import { getSeedProducts, readStoredProducts } from "@/lib/product-management";
+import type { Product } from "@/types/product";
 
 const highlights = [
   {
@@ -12,13 +16,22 @@ const highlights = [
     description: "Local cart persistence and a Stripe-ready payment handoff keep the purchase path short.",
   },
   {
-    title: "Gear that earns counter space",
-    description: "Only practical accessories: durable tools, giftable bundles, and daily-use brewing gear.",
+    title: "New product management",
+    description: "Add products, adjust stock, and toggle storefront visibility with the built-in catalog management flow.",
   },
 ];
 
 export default function HomePage() {
-  const featuredProducts = getFeaturedProducts();
+  const [products, setProducts] = useState<Product[]>(getSeedProducts());
+
+  useEffect(() => {
+    setProducts(readStoredProducts());
+  }, []);
+
+  const featuredProducts = useMemo(
+    () => products.filter((product) => product.featured && product.isActive),
+    [products],
+  );
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-20 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
@@ -27,17 +40,17 @@ export default function HomePage() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-accent">Northstar Supply</p>
             <h1 className="mt-4 max-w-2xl text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
-              Brew a better store experience from first click to checkout.
+              Brew a better store experience from first click to product management.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              Browse specialty coffee, premium tea, and countertop essentials in a clean storefront with a saved cart and a mock-to-live checkout path.
+              Browse specialty coffee, premium tea, and countertop essentials in a clean storefront with saved cart flow and built-in product administration.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/products" className="rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark">
                 Shop the catalog
               </Link>
-              <Link href="/checkout" className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:border-brand hover:text-brand">
-                Go to checkout
+              <Link href="/products/manage" className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:border-brand hover:text-brand">
+                Manage products
               </Link>
             </div>
           </div>
