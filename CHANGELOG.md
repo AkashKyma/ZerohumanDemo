@@ -1,5 +1,22 @@
 # Changelog
 
+## DEM-5 — Product Management Delivery Handoff
+
+### Added
+- Stronger product-form normalization and validation for trimmed text input, positive pricing, and non-negative integer stock values
+- Extra utility test coverage for invalid stored data and invalid product-form submissions
+- DEM-5 documentation handoff covering setup, run commands, routes, and release notes
+
+### Changed
+- Product-management documentation now reflects the `/products/manage` workflow as the primary in-app catalog admin surface
+- Release notes now describe active/inactive catalog visibility, stock updates, edit flow, and browser-local persistence in DEM-5 terms
+- Implementation notes now document the hardened validation path and operational handoff expectations
+
+### Verified
+- Product-management implementation commit present: `feat(dem-5): harden product management form flow` (`94c6093`)
+- Scribe phase limited to markdown/documentation updates only
+- Release verification rerun during Scribe phase: `npm test` and `npm run build`
+
 ## DEM-4 — Product Management for the Storefront
 
 ### Added
