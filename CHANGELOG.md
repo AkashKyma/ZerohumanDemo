@@ -1,5 +1,21 @@
 # Changelog
 
+## DEM-6 — Product Management Release Handoff
+
+### Summary
+- Finalized the ecommerce product-management feature under the DEM-6 ticket name
+- Confirmed the catalog supports add, edit, stock updates, and active/inactive control
+- Reconciled release docs so the delivered feature matches the current ticket and handoff expectations
+
+### Changed
+- Shopper-facing product detail behavior now respects inactive catalog state
+- README, changelog, and implementation notes now describe the product-management flow as DEM-6 instead of the earlier DEM-4 naming
+- Documentation now calls out the management route, browser-local persistence model, and the inactive-product visibility rules
+
+### Verified
+- `npm test`
+- `npm run build`
+
 ## DEM-4 — Product Management for the Storefront
 
 ### Added
