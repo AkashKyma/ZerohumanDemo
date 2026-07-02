@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ProductFormValues } from "@/lib/product-management";
+import {
+  prepareProductFormValues,
+  type ProductFormErrors,
+  type ProductFormValues,
+} from "@/lib/product-management";
 import { PRODUCT_CATEGORIES, type Product } from "@/types/product";
 
 interface ProductFormProps {
@@ -35,20 +39,39 @@ function getInitialValues(product?: Product | null): ProductFormValues {
 
 export function ProductForm({ product, onSubmit, onCancelEdit }: ProductFormProps) {
   const [values, setValues] = useState<ProductFormValues>(getInitialValues(product));
+  const [errors, setErrors] = useState<ProductFormErrors>({});
 
   useEffect(() => {
     setValues(getInitialValues(product));
+    setErrors({});
   }, [product]);
+
+  const updateField = <Field extends keyof ProductFormValues>(field: Field, value: ProductFormValues[Field]) => {
+    setValues((current) => ({ ...current, [field]: value }));
+    setErrors((current) => {
+      if (!current[field as keyof ProductFormErrors]) {
+        return current;
+      }
+
+      const nextErrors = { ...current };
+      delete nextErrors[field as keyof ProductFormErrors];
+      return nextErrors;
+    });
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSubmit({
-      ...values,
-      name: values.name.trim(),
-      description: values.description.trim(),
-      price: Number(values.price),
-      stockQuantity: Number(values.stockQuantity),
-    });
+    const submission = prepareProductFormValues(values);
+
+    setValues(submission.values);
+
+    if (!submission.isValid) {
+      setErrors(submission.errors);
+      return;
+    }
+
+    setErrors({});
+    onSubmit(submission.values);
   };
 
   return (
@@ -70,10 +93,11 @@ export function ProductForm({ product, onSubmit, onCancelEdit }: ProductFormProp
         <input
           required
           value={values.name}
-          onChange={(event) => setValues((current) => ({ ...current, name: event.target.value }))}
+          onChange={(event) => updateField("name", event.target.value)}
           className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           placeholder="Aurora Summer Roast"
         />
+        {errors.name ? <p className="text-sm text-rose-600">{errors.name}</p> : null}
       </label>
 
       <label className="block space-y-2 text-sm font-medium text-slate-700">
@@ -81,10 +105,11 @@ export function ProductForm({ product, onSubmit, onCancelEdit }: ProductFormProp
         <textarea
           required
           value={values.description}
-          onChange={(event) => setValues((current) => ({ ...current, description: event.target.value }))}
+          onChange={(event) => updateField("description", event.target.value)}
           className="min-h-28 w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           placeholder="Add a concise, customer-facing description."
         />
+        {errors.description ? <p className="text-sm text-rose-600">{errors.description}</p> : null}
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -96,16 +121,17 @@ export function ProductForm({ product, onSubmit, onCancelEdit }: ProductFormProp
             min="0"
             step="0.01"
             value={values.price}
-            onChange={(event) => setValues((current) => ({ ...current, price: Number(event.target.value) }))}
+            onChange={(event) => updateField("price", Number(event.target.value))}
             className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
+          {errors.price ? <p className="text-sm text-rose-600">{errors.price}</p> : null}
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-slate-700">
           Category
           <select
             value={values.category}
-            onChange={(event) => setValues((current) => ({ ...current, category: event.target.value as ProductFormValues["category"] }))}
+            onChange={(event) => updateField("category", event.target.value as ProductFormValues["category"])}
             className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           >
             {PRODUCT_CATEGORIES.map((category) => (
@@ -126,16 +152,17 @@ export function ProductForm({ product, onSubmit, onCancelEdit }: ProductFormProp
             min="0"
             step="1"
             value={values.stockQuantity}
-            onChange={(event) => setValues((current) => ({ ...current, stockQuantity: Number(event.target.value) }))}
+            onChange={(event) => updateField("stockQuantity", Number(event.target.value))}
             className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
           />
+          {errors.stockQuantity ? <p className="text-sm text-rose-600">{errors.stockQuantity}</p> : null}
         </label>
 
         <label className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700">
           <input
             type="checkbox"
             checked={values.isActive}
-            onChange={(event) => setValues((current) => ({ ...current, isActive: event.target.checked }))}
+            onChange={(event) => updateField("isActive", event.target.checked)}
           />
           Visible in storefront
         </label>

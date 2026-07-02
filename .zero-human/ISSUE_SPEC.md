@@ -1,4 +1,4 @@
-# DEM-4: Add product management items to ecommerce app and send all agent reports to Slack
+# DEM-5: Add product management items to ecommerce app and send all agent reports to Slack
 
 Build the requested ecommerce enhancement and make sure every agent reports progress to Slack.
 
