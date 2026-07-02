@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { ProductGrid } from "@/components/ProductGrid";
-import { getFeaturedProducts } from "@/lib/products";
+import { getSeedProducts, readStoredProducts } from "@/lib/product-management";
+import type { Product } from "@/types/product";
 
 const highlights = [
   {
@@ -18,7 +22,16 @@ const highlights = [
 ];
 
 export default function HomePage() {
-  const featuredProducts = getFeaturedProducts();
+  const [products, setProducts] = useState<Product[]>(getSeedProducts());
+
+  useEffect(() => {
+    setProducts(readStoredProducts());
+  }, []);
+
+  const featuredProducts = useMemo(
+    () => products.filter((product) => product.featured && product.isActive),
+    [products],
+  );
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-20 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
