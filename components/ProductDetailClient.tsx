@@ -15,10 +15,13 @@ export function ProductDetailClient({ slug }: { slug: string }) {
     setHydrated(true);
   }, []);
 
-  const product = useMemo(
-    () => products.find((item) => item.slug === slug) ?? getProductBySlug(slug, { includeInactive: true }),
-    [products, slug],
-  );
+  const product = useMemo(() => {
+    const storedProduct = products.find((item) => item.slug === slug);
+    const fallbackProduct = hydrated ? null : getProductBySlug(slug);
+    const nextProduct = storedProduct ?? fallbackProduct ?? null;
+
+    return nextProduct?.isActive ? nextProduct : null;
+  }, [hydrated, products, slug]);
 
   const relatedProducts = useMemo(() => {
     if (!product) {
