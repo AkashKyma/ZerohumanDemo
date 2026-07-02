@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
 import type { Product } from "@/types/product";
 
@@ -47,7 +48,12 @@ describe("ProductDetailClient", () => {
     getProductBySlugMock.mockReturnValue(activeSeedProduct);
   });
 
-  it("renders the active product after hydration", async () => {
+  it("renders a loading shell before hydration and the active product after hydration", async () => {
+    const serverMarkup = renderToString(<ProductDetailClient slug="aurora-roast" />);
+
+    expect(serverMarkup).toContain("Loading product details…");
+    expect(serverMarkup).not.toContain("Aurora Roast");
+
     render(<ProductDetailClient slug="aurora-roast" />);
 
     await waitFor(() => {
@@ -55,8 +61,13 @@ describe("ProductDetailClient", () => {
     });
   });
 
-  it("hides inactive products from the storefront detail route after hydration", async () => {
+  it("never exposes inactive products on the storefront detail route", async () => {
     readStoredProductsMock.mockReturnValue([inactiveStoredProduct]);
+
+    const serverMarkup = renderToString(<ProductDetailClient slug="aurora-roast" />);
+
+    expect(serverMarkup).toContain("Loading product details…");
+    expect(serverMarkup).not.toContain("Aurora Roast");
 
     render(<ProductDetailClient slug="aurora-roast" />);
 

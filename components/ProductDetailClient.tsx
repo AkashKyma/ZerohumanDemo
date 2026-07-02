@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ProductDetailView } from "@/components/ProductDetailView";
-import { getProductBySlug } from "@/lib/products";
 import { getSeedProducts, readStoredProducts } from "@/lib/product-management";
 import type { Product } from "@/types/product";
 
@@ -16,11 +15,12 @@ export function ProductDetailClient({ slug }: { slug: string }) {
   }, []);
 
   const product = useMemo(() => {
-    const storedProduct = products.find((item) => item.slug === slug);
-    const fallbackProduct = hydrated ? null : getProductBySlug(slug);
-    const nextProduct = storedProduct ?? fallbackProduct ?? null;
+    if (!hydrated) {
+      return null;
+    }
 
-    return nextProduct?.isActive ? nextProduct : null;
+    const storedProduct = products.find((item) => item.slug === slug) ?? null;
+    return storedProduct?.isActive ? storedProduct : null;
   }, [hydrated, products, slug]);
 
   const relatedProducts = useMemo(() => {
