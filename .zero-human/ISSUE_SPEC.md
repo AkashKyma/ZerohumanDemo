@@ -1,46 +1,123 @@
-# DEM-2: E-commerce Store
+# DEM-4: Add product management items to ecommerce app and send all agent reports to Slack
 
-## ⚠️ Agent Implementation Directive
+Build the requested ecommerce enhancement and make sure every agent reports progress to Slack.
 
-**You MUST build the COMPLETE, FULLY WORKING application described below.**
 
-* Write ALL source code files needed to run this project (components, pages, API routes, styles, config, tests)
-* Do NOT create only documentation, markdown files, README updates, or empty scaffold folders
-* Do NOT leave placeholder comments like `// TODO: implement this` — write the actual implementation
-* The project MUST be runnable with `npm run dev` (or the specified command) after your PR is merged
-* Every acceptance criterion listed below must pass when a human tests the running app
-* If an API key or env var is needed, include a `.env.example` AND fallback/mock data so the app works without it
-* Commit ALL necessary files: package.json, all source files, config files, public assets
 
-**This is a full project build, not a documentation task.**
+Feature request:
 
-## Problem / Overview
+Add product management items in the ecommerce app.
 
-Problem: Need a complete online store with product browsing and checkout
 
-Solution: Next.js with Tailwind, product catalog from JSON, cart in localStorage, Stripe-ready checkout form
 
-Users: Online shoppers browsing and buying products
+Required implementation:
 
-Expected outcome: A complete e-commerce store runnable with npm
+1\. Add support for products in the ecommerce app.
 
-## Tech Stack & Solution
+2\. Each product should have:
 
-Not specified
+&#x20;  \- name
 
-## Implementation Notes
+&#x20;  \- description
 
-Dev: npm run dev
-Build: npm run build
-Install: npm install
+&#x20;  \- price
 
-***
+&#x20;  \- category
 
-## Definition of Done
+&#x20;  \- stock quantity
 
-* [ ] `npm run dev` (or equivalent) starts the app without errors
-* [ ] `npm run build` completes without errors
-* [ ] All routes/pages listed in the spec render correctly
-* [ ] All acceptance criteria above pass when tested in browser
-* [ ] No files are empty placeholders — all source code is written
-* [ ] `.env.example` exists if any environment variables are needed
+&#x20;  \- active status
+
+3\. Show products in the UI.
+
+4\. Allow adding a new product.
+
+5\. Allow editing an existing product.
+
+6\. Allow updating stock quantity.
+
+7\. Allow toggling active/inactive status.
+
+8\. Keep the implementation simple, usable, and production-clean.
+
+9\. Update docs if needed.
+
+
+
+Slack reporting is mandatory:
+
+Each phase must send its own Slack report before finishing.
+
+
+
+Architect must send:
+
+ARCHITECT\_REPORT:
+
+\- issue ID
+
+\- plan
+
+\- impacted files/areas
+
+\- implementation strategy
+
+
+
+Grunt must send:
+
+GRUNT\_REPORT:
+
+\- what was implemented
+
+\- files changed
+
+\- anything blocked
+
+\- current status
+
+
+
+Pedant must send:
+
+PEDANT\_REPORT:
+
+\- review/test summary
+
+\- bugs found or no issues found
+
+\- quality status
+
+
+
+Scribe must send:
+
+SCRIBE\_REPORT:
+
+\- final summary
+
+\- final deliverables
+
+\- PR / handoff summary
+
+
+
+Slack failure rule:
+
+If any role cannot send Slack report, it must explicitly output:
+
+SLACK\_FAILED: \<reason>
+
+
+
+Acceptance criteria:
+
+\- ecommerce app supports product management flow
+
+\- UI shows products clearly
+
+\- add/edit/update stock/toggle status works
+
+\- all four agent reports are posted to Slack
+
+\- final result is clean and usable
