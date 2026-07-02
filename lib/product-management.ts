@@ -13,6 +13,13 @@ export interface ProductFormValues {
   isActive: boolean;
 }
 
+export interface ProductFormErrors {
+  name?: string;
+  description?: string;
+  price?: string;
+  stockQuantity?: string;
+}
+
 type RawProductRecord = Partial<Product> & {
   inventory?: number;
   active?: boolean;
@@ -49,7 +56,7 @@ function normalizePrice(value: unknown) {
     return 0;
   }
 
-  return Number(value.toFixed(2));
+  return Math.max(0, Number(value.toFixed(2)));
 }
 
 function normalizeStock(value: unknown) {
@@ -58,6 +65,39 @@ function normalizeStock(value: unknown) {
   }
 
   return Math.max(0, Math.floor(value));
+}
+
+export function prepareProductFormValues(values: ProductFormValues) {
+  const normalizedValues: ProductFormValues = {
+    ...values,
+    name: values.name.trim(),
+    description: values.description.trim(),
+    price: normalizePrice(values.price),
+    stockQuantity: normalizeStock(values.stockQuantity),
+  };
+  const errors: ProductFormErrors = {};
+
+  if (!normalizedValues.name) {
+    errors.name = "Enter a product name.";
+  }
+
+  if (!normalizedValues.description) {
+    errors.description = "Enter a product description.";
+  }
+
+  if (normalizedValues.price <= 0) {
+    errors.price = "Enter a price greater than 0.";
+  }
+
+  if (!Number.isInteger(normalizedValues.stockQuantity) || normalizedValues.stockQuantity < 0) {
+    errors.stockQuantity = "Enter a stock quantity of 0 or more.";
+  }
+
+  return {
+    values: normalizedValues,
+    errors,
+    isValid: Object.keys(errors).length === 0,
+  };
 }
 
 export function slugifyProductName(value: string) {

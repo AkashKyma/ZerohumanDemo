@@ -1,6 +1,7 @@
 import {
   PRODUCTS_STORAGE_KEY,
   getSeedProducts,
+  prepareProductFormValues,
   readStoredProducts,
   setProductStock,
   toggleProductActive,
@@ -71,5 +72,29 @@ describe("product management utilities", () => {
 
     expect(products).toHaveLength(getSeedProducts().length);
     expect(products[0].id).toBe(getSeedProducts()[0].id);
+  });
+
+  it("normalizes form input and reports invalid values", () => {
+    const submission = prepareProductFormValues({
+      name: "   ",
+      description: "  ",
+      price: -5.239,
+      category: "Coffee",
+      stockQuantity: -2.4,
+      isActive: true,
+    });
+
+    expect(submission.isValid).toBe(false);
+    expect(submission.values).toMatchObject({
+      name: "",
+      description: "",
+      price: 0,
+      stockQuantity: 0,
+    });
+    expect(submission.errors).toMatchObject({
+      name: "Enter a product name.",
+      description: "Enter a product description.",
+      price: "Enter a price greater than 0.",
+    });
   });
 });
