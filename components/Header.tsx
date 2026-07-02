@@ -7,9 +7,22 @@ import { useCart } from "@/context/CartContext";
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Shop" },
+  { href: "/products/manage", label: "Manage" },
   { href: "/cart", label: "Cart" },
   { href: "/checkout", label: "Checkout" },
 ];
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") {
+    return pathname === href;
+  }
+
+  if (href === "/products") {
+    return pathname === href || (pathname.startsWith("/products/") && !pathname.startsWith("/products/manage"));
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function Header() {
   const pathname = usePathname();
@@ -17,13 +30,13 @@ export function Header() {
 
   return (
     <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="text-xl font-semibold tracking-tight text-ink">
           Northstar Supply
         </Link>
-        <nav className="flex items-center gap-5 text-sm font-medium text-slate-600">
+        <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-slate-600">
           {navItems.map((item) => {
-            const active = pathname === item.href;
+            const active = isActivePath(pathname, item.href);
             return (
               <Link
                 key={item.href}

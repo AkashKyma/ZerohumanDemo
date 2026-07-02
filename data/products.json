@@ -8,7 +8,8 @@
     "category": "Coffee",
     "image": "/images/aurora-espresso.svg",
     "featured": true,
-    "inventory": 24,
+    "stockQuantity": 24,
+    "isActive": true,
     "rating": 4.8,
     "tags": ["Espresso", "Chocolate", "House Blend"]
   },
@@ -21,7 +22,8 @@
     "category": "Coffee",
     "image": "/images/sunrise-filter.svg",
     "featured": true,
-    "inventory": 32,
+    "stockQuantity": 32,
+    "isActive": true,
     "rating": 4.7,
     "tags": ["Filter", "Fruit Forward", "Washed"]
   },
@@ -34,7 +36,8 @@
     "category": "Coffee",
     "image": "/images/midnight-decaf.svg",
     "featured": false,
-    "inventory": 18,
+    "stockQuantity": 18,
+    "isActive": true,
     "rating": 4.5,
     "tags": ["Decaf", "Swiss Water", "Balanced"]
   },
@@ -47,7 +50,8 @@
     "category": "Tea",
     "image": "/images/matcha-cloud.svg",
     "featured": true,
-    "inventory": 14,
+    "stockQuantity": 14,
+    "isActive": true,
     "rating": 4.9,
     "tags": ["Matcha", "Ceremonial", "Umami"]
   },
@@ -60,7 +64,8 @@
     "category": "Tea",
     "image": "/images/oolong-mist.svg",
     "featured": false,
-    "inventory": 20,
+    "stockQuantity": 20,
+    "isActive": true,
     "rating": 4.6,
     "tags": ["Oolong", "Floral", "Mountain Tea"]
   },
@@ -73,7 +78,8 @@
     "category": "Accessories",
     "image": "/images/brew-scale.svg",
     "featured": true,
-    "inventory": 11,
+    "stockQuantity": 11,
+    "isActive": true,
     "rating": 4.7,
     "tags": ["Scale", "Brewing", "Barista Tools"]
   },
@@ -86,7 +92,8 @@
     "category": "Accessories",
     "image": "/images/travel-mug.svg",
     "featured": false,
-    "inventory": 27,
+    "stockQuantity": 27,
+    "isActive": true,
     "rating": 4.4,
     "tags": ["Travel", "Insulated", "Daily Carry"]
   },
@@ -99,7 +106,8 @@
     "category": "Gift Sets",
     "image": "/images/weekend-gift-set.svg",
     "featured": true,
-    "inventory": 8,
+    "stockQuantity": 8,
+    "isActive": true,
     "rating": 4.9,
     "tags": ["Gift", "Starter Kit", "Bundle"]
   }
